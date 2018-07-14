@@ -1,0 +1,43 @@
+<?php
+..
+$mysqli = new mysqli('w0147e33.kasserver.com', 'd0252fb5', '5uAgRuV6QvkFN6KX', 'd0252fb5');
+
+$mysqli->set_charset("utf8");
+
+if (!$mysqli) {
+	die('Connection Error: ' . mysql_error());
+}
+
+
+
+$new_path = "uploads/".$_POST['user'].'/'.$_POST['potential'].'/';
+
+$tmp_file = $_FILES['image']['tmp_name'];
+
+$filename = $_FILES['image']['name'];
+$filename = str_replace('.pdf', '_'.time().'.pdf', $filename);
+
+$ckUploads = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT COUNT(upload) as T from _uploads WHERE uFilename='".$filename."'"));
+
+if ($ckUploads['T'] == 0) {
+mysqli_query($mysqli, "INSERT INTO _uploads 
+		(
+		uFilename,
+		zID,
+		relatedID,
+		uPath
+		) 
+		VALUES 
+		(
+		'".$filename."',
+		'".$_POST['user']."',
+		'".$_POST['potential']."',
+		'".$new_path."'
+		)");
+}
+
+mkdir($basePath."uploads/".$_POST['user'], 0700);
+mkdir($basePath."uploads/".$_POST['user'].'/'.$_POST['potential'], 0700);
+move_uploaded_file($tmp_file, $basePath.$new_path.$filename);
+
+?>
